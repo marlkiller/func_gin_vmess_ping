@@ -1,0 +1,132 @@
+host : https://go.fc.voidm.com/
+<br>
+vpessping : <a target="_blank" href="/vmess_ping?vmess=xxx">/vmess_ping?vmess=xxx</a>
+<br>
+<!-- instance : <a target="_blank" href="/instance">/instance</a> -->
+instance_details
+<br>
+<!-- <textarea  id="instanceDetail" name="texteara"wrap="hard"required="required" style="width: auto;height: auto;"></textarea> -->
+<pre id="instanceDetail"></pre>
+
+<br>
+vmess_details
+<br>
+<!-- <textarea  id="instanceDetail" name="texteara"wrap="hard"required="required" style="width: auto;height: auto;"></textarea> -->
+<pre id="vmessDetail"></pre>
+<br>
+add : <input type="text" id="add" style="margin-right: 10px;"> id : <input type="text" id="id"> <input type="button" value="Generate QRCode" id="generate" onclick="generate()">
+<div id="qrcode" style="margin-top: 10px;"></div>
+<hr>
+
+
+<style>
+    pre {
+        outline: 1px solid #ccc;
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .string {
+        color: green;
+    }
+
+    .number {
+        color: darkorange;
+    }
+
+    .boolean {
+        color: blue;
+    }
+
+    .null {
+        color: magenta;
+    }
+
+    .key {
+        color: red;
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+
+<script>
+    var vmess;
+    var qrcode;
+
+    function syntaxHighlight(json) {
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, undefined, 2);
+        }
+        json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    if (window.location.href.indexOf("marlkiller") > 0) {
+
+        var data = JSON.stringify({
+        });
+
+        var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                var parse = JSON.parse(this.responseText)
+                document.getElementById("instanceDetail").innerHTML = syntaxHighlight(parse)
+
+                qrcode  = new QRCode("qrcode", {
+                    text:  "vmess://" + parse.vmess,
+                    width: 320,
+                    height: 320,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                
+                vmess = JSON.parse(window.atob(parse.vmess))
+                document.getElementById("vmessDetail").innerHTML = syntaxHighlight(vmess)
+
+                document.getElementById("id").value = vmess.id;
+                document.getElementById("add").value = vmess.add;
+            }
+        });
+
+        xhr.open("GET", "/instance");
+        xhr.send(data);
+
+    }
+
+
+    function generate (){
+        vmess.id = document.getElementById("id").value;
+        if(!vmess.id){
+            return;
+        }
+        vmess.add = document.getElementById("add").value;
+        if(!vmess.add){
+            return;
+        }
+
+        document.getElementById("vmessDetail").innerHTML = syntaxHighlight(vmess)
+
+        var node = document.getElementById('qrcode');
+        qrcode.clear();
+        qrcode.makeCode("vmess://" + window.btoa(JSON.stringify(vmess)))
+    }
+
+</script>
