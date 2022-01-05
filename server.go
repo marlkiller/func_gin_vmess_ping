@@ -32,7 +32,7 @@ const (
 	accessKey    = ""
 	secretKey    = ""
 	region       = "ap-southeast-1"
-	instanceName = "CentOS-1-Multi-V2ray"
+	instanceName = "CentOS-1-V2ray"
 )
 
 func main() {
@@ -105,17 +105,16 @@ func main() {
 
 		vmess, err := json.Marshal(map[string]string{
 			"v":    "2",
-			"ps":   "aws-ktcp",
+			"ps":   "aws-tcp",
 			"add":  *instance.PublicIpAddress,
 			"port": "3306",
 			"id":   "5d4893a0-18d5-11eb-a501-029405bb920e",
-			"aid":  "2",
-			"net":  "kcp",
+			"aid":  "0",
+			"net":  "tcp",
 			"type": "none",
 			"host": "",
 			"path": "",
 			"tls":  "",
-			"sni":  "",
 		})
 
 		result := gin.H{"Arn": *instance.Arn, "BlueprintId": *instance.BlueprintId,
