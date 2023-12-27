@@ -9,7 +9,9 @@ go build
 #### linux
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 #### mac
-CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build  
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build
+
 #### windows
 CGO_ENABLED=0 GOOS=windows GOARCH=386 go build 
 
